@@ -248,35 +248,56 @@
             font-weight: 600;
         }
 
-        /* --- 하단 미니멀 푸터 (Wi-Fi & 정보) --- */
+        /* --- 하단 모던 인포메이션 푸터 --- */
         footer {
             background-color: #1A1A1A;
-            height: 55px;
+            height: 65px;
             display: flex;
-            justify-content: space-between;
+            justify-content: center; /* 가운데 정렬로 세련됨 강조 */
             align-items: center;
-            padding: 0 60px;
-            color: #AAAAAA;
-            font-size: 0.95rem;
             flex-shrink: 0;
+            border-top: 2px solid var(--lotte-red);
+        }
+
+        .contact-capsule {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 8px 25px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .contact-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #AAAAAA;
+            letter-spacing: 1.5px;
+        }
+
+        .contact-divider {
+            width: 1px;
+            height: 14px;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .contact-number {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #FFFFFF;
             letter-spacing: 0.5px;
         }
-
-        footer strong {
-            color: #FFFFFF;
-            margin-right: 8px;
-            font-weight: 700;
-        }
-
-        .footer-left, .footer-right {
-            display: flex;
-            align-items: center;
+        
+        .contact-number span {
+            color: var(--lotte-red);
         }
     </style>
 </head>
 <body>
 
 <div id="dashboard">
+    <!-- 상단 헤더 -->
     <header>
         <div class="logo-area">
             <img src="logo.png" alt="LOTTE GRS" class="logo-img">
@@ -287,11 +308,13 @@
         </div>
     </header>
 
+    <!-- 서브 헤더 -->
     <div class="sub-header">
         <div class="guide-box">
             <h2>오늘의 교육 과정 <span id="total-count" style="font-size:1.1rem; color:#999; margin-left:12px; font-weight:600;">(불러오는 중...)</span></h2>
             <p>아래의 <span class="highlight">과정 박스를 터치</span>하시면 교육이 진행되는 층수와 강의장을 확인하실 수 있습니다.</p>
         </div>
+        <!-- 필터 버튼 영역 -->
         <div class="filter-group">
             <button class="filter-btn active" data-filter="all">전체보기</button>
             <button class="filter-btn" data-filter="5F">5F</button>
@@ -301,16 +324,17 @@
         </div>
     </div>
 
+    <!-- 메인 그리드 -->
     <main class="main-content" id="courseContainer">
         <div class="loading-text">전체 교육 과정을 동기화 중입니다...</div>
     </main>
 
+    <!-- 세련된 모던 푸터 -->
     <footer>
-        <div class="footer-left">
-            <span><strong>📶 Wi-Fi</strong> ID : GRS_Academy_EXT &nbsp;|&nbsp; PW : grsacademy1!</span>
-        </div>
-        <div class="footer-right">
-            <span><strong>📞 Information</strong> 대표 번호 : 02-709-6920</span>
+        <div class="contact-capsule">
+            <span class="contact-label">INFORMATION</span>
+            <span class="contact-divider"></span>
+            <span class="contact-number"><span>📞</span> 02-709-6920</span>
         </div>
     </footer>
 </div>
@@ -325,8 +349,9 @@
         { floor: '8F', gid: '1181338338' }
     ];
 
-    let globalCourses = []; // 전체 데이터를 저장해둘 전역 배열 (필터링용)
+    let globalCourses = [];
 
+    // 시계 동기화 함수
     function updateClock() {
         const now = new Date();
         const y = now.getFullYear();
@@ -340,6 +365,7 @@
         document.getElementById('current-time').innerText = `${hh}:${mm}`;
     }
 
+    // 구글 시트 데이터 로드 함수
     async function fetchAllCourses() {
         try {
             const fetchPromises = sheets.map(async (sheet) => {
@@ -364,7 +390,7 @@
             // 총 건수 업데이트
             document.getElementById('total-count').innerText = `(총 ${globalCourses.length}건)`;
 
-            // 현재 눌려져 있는 필터 상태를 확인하고 화면 렌더링
+            // 현재 눌려진 필터 상태에 맞춰 화면 렌더링
             const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
             applyFilter(activeFilter);
 
@@ -374,7 +400,7 @@
         }
     }
 
-    // 카드 렌더링 함수
+    // 카드 렌더링 함수 (재렌더링 시 자동으로 카드가 앞면으로 복구됨)
     function renderDashboard(courses) {
         const container = document.getElementById('courseContainer');
         
@@ -409,26 +435,38 @@
         }
     }
 
+    // [기능 추가] 20초마다 실행되는 자동 리셋 및 데이터 최신화 함수
+    function resetAndFetch() {
+        // 1. 필터 버튼을 '전체보기'로 강제 초기화
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(b => b.classList.remove('active'));
+        document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
+
+        // 2. 데이터를 다시 불러오면서 렌더링 (이 과정에서 뒤집힌 카드도 앞면으로 리셋됨)
+        fetchAllCourses();
+    }
+
     // 필터 버튼 클릭 이벤트 바인딩
     const filterBtns = document.querySelectorAll('.filter-btn');
     filterBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
-            // 활성화 스타일 변경
             filterBtns.forEach(b => b.classList.remove('active'));
             e.currentTarget.classList.add('active');
             
-            // 데이터 필터링 실행
             const filterValue = e.currentTarget.getAttribute('data-filter');
             applyFilter(filterValue);
         });
     });
 
-    // 시스템 실행 루프
+    // 시스템 실행 루프 세팅
     updateClock();
-    setInterval(updateClock, 1000);
+    setInterval(updateClock, 1000); // 1초마다 시계 업데이트
     
+    // 초기 1회 로드
     fetchAllCourses();
-    setInterval(fetchAllCourses, 60000); // 1분마다 구글시트 자동 업데이트
+    
+    // 20초 주기 자동 리셋 및 데이터 최신화
+    setInterval(resetAndFetch, 20000); 
 </script>
 
 </body>
