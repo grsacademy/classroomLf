@@ -33,7 +33,7 @@
             max-width: 177.78vh;
             background-color: var(--bg-light);
             display: flex;
-            flex-direction: column; /* 세로 배치 (헤더 + 메인 컨텐츠) */
+            flex-direction: column;
             box-shadow: 0 0 100px rgba(0,0,0,0.5);
             position: relative;
         }
@@ -41,7 +41,7 @@
         /* --- 상단 헤더 영역 --- */
         header {
             background-color: white;
-            height: 120px;
+            height: 110px;
             padding: 0 60px;
             display: flex;
             justify-content: space-between;
@@ -76,13 +76,76 @@
             line-height: 1;
         }
 
+        /* --- 서브 헤더 (안내 문구 & 필터 버튼) --- */
+        .sub-header {
+            padding: 35px 60px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-shrink: 0;
+        }
+
+        .guide-box h2 {
+            font-size: 1.8rem;
+            color: var(--lotte-red);
+            font-weight: 800;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .guide-box p {
+            font-size: 1.15rem;
+            color: var(--text-sub);
+            font-weight: 500;
+            letter-spacing: -0.3px;
+        }
+
+        .guide-box .highlight {
+            color: var(--text-main);
+            font-weight: 700;
+            background: #FFF2F3;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* 필터 버튼 영역 */
+        .filter-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 10px 22px;
+            border-radius: 25px;
+            border: 1px solid #DDD;
+            background: white;
+            color: var(--text-sub);
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .filter-btn:hover {
+            border-color: #BBB;
+            color: var(--text-main);
+        }
+
+        .filter-btn.active {
+            background: var(--lotte-red);
+            color: white;
+            border-color: var(--lotte-red);
+            box-shadow: 0 4px 12px rgba(230, 0, 18, 0.2);
+        }
+
         /* --- 메인 콘텐츠 (과정 카드 그리드) --- */
         .main-content {
             flex: 1;
-            padding: 50px 60px;
-            overflow-y: auto; /* 과정이 많을 경우 스크롤 허용 */
+            padding: 30px 60px 50px;
+            overflow-y: auto;
             display: grid;
-            /* 화면 크기에 맞춰 카드가 자동 배열되도록 설정 */
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 30px;
             align-content: start;
@@ -91,7 +154,7 @@
         /* --- 인터랙티브 플립(Flip) 카드 스타일 --- */
         .course-card {
             background-color: transparent;
-            perspective: 1000px; /* 3D 효과 원근감 부여 */
+            perspective: 1000px;
             height: 220px;
             cursor: pointer;
             animation: fadeInUp 0.6s ease-out forwards;
@@ -109,7 +172,6 @@
             border-radius: 25px;
         }
 
-        /* 카드가 클릭(flipped 클래스 추가)되었을 때 뒤집어짐 */
         .course-card.flipped .card-inner {
             transform: rotateY(180deg);
         }
@@ -118,7 +180,7 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            backface-visibility: hidden; /* 뒷면 숨김 처리 */
+            backface-visibility: hidden;
             border-radius: 25px;
             display: flex;
             flex-direction: column;
@@ -128,7 +190,6 @@
             box-sizing: border-box;
         }
 
-        /* 카드 앞면 (과정명) */
         .card-front {
             background-color: white;
             border-top: 6px solid var(--lotte-red);
@@ -152,7 +213,6 @@
             border-radius: 20px;
         }
 
-        /* 카드 뒷면 (층수 & 강의장) */
         .card-back {
             background-color: var(--lotte-red);
             color: white;
@@ -179,7 +239,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 로딩 텍스트 */
         .loading-text {
             grid-column: 1 / -1;
             text-align: center;
@@ -187,6 +246,31 @@
             color: var(--text-sub);
             margin-top: 50px;
             font-weight: 600;
+        }
+
+        /* --- 하단 미니멀 푸터 (Wi-Fi & 정보) --- */
+        footer {
+            background-color: #1A1A1A;
+            height: 55px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 60px;
+            color: #AAAAAA;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+            letter-spacing: 0.5px;
+        }
+
+        footer strong {
+            color: #FFFFFF;
+            margin-right: 8px;
+            font-weight: 700;
+        }
+
+        .footer-left, .footer-right {
+            display: flex;
+            align-items: center;
         }
     </style>
 </head>
@@ -203,15 +287,37 @@
         </div>
     </header>
 
+    <div class="sub-header">
+        <div class="guide-box">
+            <h2>오늘의 교육 과정 <span id="total-count" style="font-size:1.1rem; color:#999; margin-left:12px; font-weight:600;">(불러오는 중...)</span></h2>
+            <p>아래의 <span class="highlight">과정 박스를 터치</span>하시면 교육이 진행되는 층수와 강의장을 확인하실 수 있습니다.</p>
+        </div>
+        <div class="filter-group">
+            <button class="filter-btn active" data-filter="all">전체보기</button>
+            <button class="filter-btn" data-filter="5F">5F</button>
+            <button class="filter-btn" data-filter="6F">6F</button>
+            <button class="filter-btn" data-filter="7F">7F</button>
+            <button class="filter-btn" data-filter="8F">8F</button>
+        </div>
+    </div>
+
     <main class="main-content" id="courseContainer">
-        <div class="loading-text">전체 교육 과정을 불러오는 중입니다...</div>
+        <div class="loading-text">전체 교육 과정을 동기화 중입니다...</div>
     </main>
+
+    <footer>
+        <div class="footer-left">
+            <span><strong>📶 Wi-Fi</strong> ID : GRS_Academy_EXT &nbsp;|&nbsp; PW : grsacademy1!</span>
+        </div>
+        <div class="footer-right">
+            <span><strong>📞 Information</strong> 대표 번호 : 02-709-6920</span>
+        </div>
+    </footer>
 </div>
 
 <script>
     const BASE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThSEdRPQ80O2WMC8E-ceES--tvUAIVPlIR4_gmRq2Uoix8CxKqU3WQSkh5O3bKPI4tU56jqMXPKQcn/pub';
     
-    // 💡 전체 층 데이터를 한 번에 수집하기 위한 배열 (이전 코드에서 제공해주신 gid 기준)
     const sheets = [
         { floor: '5F', gid: '1841070893' },
         { floor: '6F', gid: '1863328310' },
@@ -219,7 +325,8 @@
         { floor: '8F', gid: '1181338338' }
     ];
 
-    // 실시간 시계 시스템
+    let globalCourses = []; // 전체 데이터를 저장해둘 전역 배열 (필터링용)
+
     function updateClock() {
         const now = new Date();
         const y = now.getFullYear();
@@ -233,48 +340,49 @@
         document.getElementById('current-time').innerText = `${hh}:${mm}`;
     }
 
-    // 4개 층의 구글 시트 데이터를 동시에 불러와 합치는 함수
     async function fetchAllCourses() {
         try {
-            // Promise.all을 사용하여 4개의 시트를 동시에 병렬로 로드 (속도 향상)
             const fetchPromises = sheets.map(async (sheet) => {
                 const targetUrl = `${BASE_SHEET_URL}?gid=${sheet.gid}&single=true&output=csv`;
                 const response = await fetch(targetUrl);
                 const data = await response.text();
                 const rows = data.split('\n').slice(1);
                 
-                // 각 층별 CSV 파싱 (비어있는 행 제외)
                 return rows.map(row => {
                     const cols = row.split(',');
                     return {
                         title: cols[0]?.trim(),
                         room: cols[2]?.trim(),
-                        floor: sheet.floor // 데이터에 소속 층수 라벨링
+                        floor: sheet.floor
                     };
-                }).filter(item => item.title && item.title !== ""); // 과정명이 있는 데이터만 필터링
+                }).filter(item => item.title && item.title !== ""); 
             });
 
-            // 4개 층의 결과를 하나로 통합
             const results = await Promise.all(fetchPromises);
-            const allCourses = results.flat(); 
+            globalCourses = results.flat(); 
 
-            renderDashboard(allCourses);
+            // 총 건수 업데이트
+            document.getElementById('total-count').innerText = `(총 ${globalCourses.length}건)`;
+
+            // 현재 눌려져 있는 필터 상태를 확인하고 화면 렌더링
+            const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+            applyFilter(activeFilter);
+
         } catch (error) {
             console.error('데이터 로드 오류:', error);
             document.getElementById('courseContainer').innerHTML = `<div class="loading-text" style="color:var(--lotte-red);">데이터를 불러오는 데 실패했습니다. 연결을 확인해주세요.</div>`;
         }
     }
 
-    // 카드를 화면에 렌더링하는 함수
+    // 카드 렌더링 함수
     function renderDashboard(courses) {
         const container = document.getElementById('courseContainer');
         
         if (courses.length === 0) {
-            container.innerHTML = `<div class="loading-text">현재 등록된 교육 과정이 없습니다.</div>`;
+            container.innerHTML = `<div class="loading-text">해당 조건에 등록된 교육 과정이 없습니다.</div>`;
             return;
         }
 
-        // HTML 문자열로 카드 리스트 생성
         container.innerHTML = courses.map((course, index) => `
             <div class="course-card" style="animation-delay: ${index * 0.05}s" onclick="this.classList.toggle('flipped')">
                 <div class="card-inner">
@@ -291,12 +399,36 @@
         `).join('');
     }
 
-    // 시스템 실행 및 타이머
+    // 필터 적용 로직
+    function applyFilter(filterValue) {
+        if(filterValue === 'all') {
+            renderDashboard(globalCourses);
+        } else {
+            const filtered = globalCourses.filter(c => c.floor === filterValue);
+            renderDashboard(filtered);
+        }
+    }
+
+    // 필터 버튼 클릭 이벤트 바인딩
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            // 활성화 스타일 변경
+            filterBtns.forEach(b => b.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            
+            // 데이터 필터링 실행
+            const filterValue = e.currentTarget.getAttribute('data-filter');
+            applyFilter(filterValue);
+        });
+    });
+
+    // 시스템 실행 루프
     updateClock();
-    setInterval(updateClock, 1000); // 1초 단위 시계 갱신
+    setInterval(updateClock, 1000);
     
     fetchAllCourses();
-    setInterval(fetchAllCourses, 60000); // 1분 단위 구글시트 자동 새로고침
+    setInterval(fetchAllCourses, 60000); // 1분마다 구글시트 자동 업데이트
 </script>
 
 </body>
