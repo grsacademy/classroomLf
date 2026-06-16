@@ -77,7 +77,7 @@
             line-height: 1;
         }
 
-        /* 안내 문구 영역 (층 선택 위로 이동) */
+        /* 안내 문구 영역 */
         .guide-area {
             margin-bottom: 25px;
         }
@@ -106,9 +106,9 @@
             word-break: keep-all;
         }
 
-        /* 층별 네비게이션 탭 (일렬 배치 구조로 전면 수정) */
+        /* 층별 네비게이션 탭 */
         .floor-nav {
-            flex: 1; /* 대시보드 내부 영역을 채우도록 설정 */
+            flex: 1;
             margin-bottom: 25px;
         }
         
@@ -122,7 +122,7 @@
 
         .floor-flex-list {
             display: flex;
-            flex-direction: column; /* 세로 일렬 정렬 */
+            flex-direction: column;
             gap: 10px;
         }
 
@@ -131,7 +131,7 @@
             background-color: #F1F3F5;
             border: 1px solid #E9ECEF;
             color: var(--text-main);
-            padding: 14px 15px; /* 시각적으로 안정적인 패딩값 조정 */
+            padding: 14px 15px;
             font-size: 1.25rem;
             font-weight: 800;
             border-radius: 12px;
@@ -151,7 +151,7 @@
             box-shadow: 0 4px 12px rgba(230, 0, 18, 0.2);
         }
 
-        /* 공지사항 (하단 고정 - 와이파이 제거됨) */
+        /* 공지사항 */
         .notice-area {
             background-color: #F9F9F9;
             padding: 20px;
@@ -159,7 +159,7 @@
             border-left: 5px solid var(--lotte-red);
         }
 
-        .notice-item { margin-bottom: 0; } /* 단일 아이템이므로 마진 제거 */
+        .notice-item { margin-bottom: 0; }
 
         .notice-label {
             font-size: 0.85rem;
@@ -247,7 +247,6 @@
             justify-content: space-between;
             align-items: center;
             margin-top: 20px;
-            gap: 20px;
         }
 
         .room-info {
@@ -280,21 +279,10 @@
             margin: 0;
         }
 
-        .direction-arrow {
-            flex-shrink: 0;
-            width: 80px; 
-            font-size: 6rem;
-            color: var(--lotte-red);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
         /* 1개짜리 과정을 위한 미세 조정 */
         .count-1 .title { font-size: 5rem; min-height: 2.6em; }
         .count-1 .info-row { font-size: 2rem; }
         .count-1 .info-label { min-width: 140px; margin-right: 15px; }
-        .count-1 .direction-arrow { font-size: 12rem; width: 150px; }
         .count-1 .room-info { min-height: 220px; }
         .count-1 .room-info p { font-size: 4rem; }
 
@@ -322,7 +310,7 @@
             <p class="guide-text">
                 롯데지알에스 아카데미에 오신 것을 환영합니다.<br>
                 아래의 층을 터치하여 오늘 진행되는 교육 과정과<br>
-				강의실 위치를 확인해 주시기 바랍니다.
+                강의실 위치를 확인해 주시기 바랍니다.
             </p>
         </div>
 
@@ -345,24 +333,14 @@
     </aside>
 
     <main class="main-content" id="courseContainer">
-        </main>
+    </main>
 </div>
 
 <script>
     const BASE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThSEdRPQ80O2WMC8E-ceES--tvUAIVPlIR4_gmRq2Uoix8CxKqU3WQSkh5O3bKPI4tU56jqMXPKQcn/pub';
     
-    let currentGid = '0';
+    let currentGid = '1841070893'; // 최초 로딩 시 5F gid로 설정
     let currentFloor = '5F';
-
-    // 화살표 SVG 데이터 맵
-    const createArrow = (path) => `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor"><path d="${path}"/></svg>`;
-    const arrowMap = {
-        'left': createArrow('M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z'),
-        'right': createArrow('M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z'),
-        'up': createArrow('M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z'),
-        'straight': createArrow('M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z'),
-        'down': createArrow('M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z')
-    };
 
     // 실시간 시계 시스템
     function updateClock() {
@@ -392,7 +370,6 @@
                     title: cols[0]?.trim(),
                     period: cols[1]?.trim(),
                     room: cols[2]?.trim(),
-                    direction: cols[3]?.trim().toLowerCase(),
                     time: cols[4]?.trim()
                 };
             }).filter(item => item.title).slice(0, 4);
@@ -403,7 +380,7 @@
         }
     }
 
-    // 카드 렌더링 시스템
+    // 카드 렌더링 시스템 (화살표 제거됨)
     function renderDashboard(courses) {
         const container = document.getElementById('courseContainer');
         container.className = `main-content count-${courses.length}`;
@@ -431,9 +408,8 @@
                 <div class="card-bottom">
                     <div class="room-info">
                         <span>LECTURE ROOM</span>
-                        <p>${course.room}</p>
+                        <p>${course.room || '-'}</p>
                     </div>
-                    <div class="direction-arrow">${arrowMap[course.direction] || arrowMap['right']}</div>
                 </div>
             </div>
         `).join('');
