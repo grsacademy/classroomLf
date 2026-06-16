@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>롯데지알에스 아카데미 안내</title>
+    <title>롯데지알에스 아카데미 통합 대시보드</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <style>
         :root {
@@ -25,322 +25,199 @@
             overflow: hidden;
         }
 
-        /* 전체 컨테이너: 16:9 비율 완벽 유지 */
+        /* 전체 컨테이너: 16:9 비율 유지 */
         #dashboard {
             width: 100vw;
             height: 56.25vw;
             max-height: 100vh;
             max-width: 177.78vh;
-            background-color: white;
+            background-color: var(--bg-light);
             display: flex;
+            flex-direction: column; /* 세로 배치 (헤더 + 메인 컨텐츠) */
             box-shadow: 0 0 100px rgba(0,0,0,0.5);
             position: relative;
         }
 
-        /* --- 왼쪽 사이드바 --- */
-        .sidebar {
-            width: 28%;
+        /* --- 상단 헤더 영역 --- */
+        header {
             background-color: white;
-            border-right: 1px solid #EEE;
+            height: 120px;
+            padding: 0 60px;
             display: flex;
-            flex-direction: column;
-            padding: 40px 35px;
-        }
-
-        .logo-area {
-            margin-bottom: 25px;
-            text-align: left;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #EEE;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            z-index: 10;
         }
 
         .logo-img {
-            height: 30px;
+            height: 35px;
             width: auto;
         }
 
-        /* 시계 영역 */
         .clock-area {
-            margin-bottom: 30px;
+            text-align: right;
         }
 
         #current-date {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             color: var(--text-sub);
-            font-weight: 500;
-            margin-bottom: 5px;
+            font-weight: 600;
+            margin-bottom: 2px;
         }
 
         #current-time {
-            font-size: 4rem;
+            font-size: 3rem;
             font-weight: 800;
             color: var(--text-main);
-            letter-spacing: -2px;
+            letter-spacing: -1px;
             line-height: 1;
         }
 
-        /* 안내 문구 영역 */
-        .guide-area {
-            margin-bottom: 25px;
-        }
-
-        .guide-title {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: var(--lotte-red);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .guide-title::after {
-            content: "";
-            flex: 1;
-            height: 2px;
-            background: #EEE;
-        }
-
-        .guide-text {
-            font-size: 1.05rem;
-            line-height: 1.6;
-            color: #444;
-            word-break: keep-all;
-        }
-
-        /* 층별 네비게이션 탭 */
-        .floor-nav {
-            flex: 1;
-            margin-bottom: 25px;
-        }
-        
-        .floor-nav-title {
-            font-size: 0.9rem;
-            color: var(--text-sub);
-            font-weight: 700;
-            margin-bottom: 12px;
-            letter-spacing: 0.5px;
-        }
-
-        .floor-flex-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .floor-btn {
-            width: 100%;
-            background-color: #F1F3F5;
-            border: 1px solid #E9ECEF;
-            color: var(--text-main);
-            padding: 14px 15px;
-            font-size: 1.25rem;
-            font-weight: 800;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            text-align: center;
-        }
-
-        .floor-btn:hover {
-            background-color: #E9ECEF;
-        }
-
-        .floor-btn.active {
-            background-color: var(--lotte-red);
-            border-color: var(--lotte-red);
-            color: white;
-            box-shadow: 0 4px 12px rgba(230, 0, 18, 0.2);
-        }
-
-        /* 공지사항 */
-        .notice-area {
-            background-color: #F9F9F9;
-            padding: 20px;
-            border-radius: 15px;
-            border-left: 5px solid var(--lotte-red);
-        }
-
-        .notice-item { margin-bottom: 0; }
-
-        .notice-label {
-            font-size: 0.85rem;
-            color: var(--lotte-red);
-            font-weight: 700;
-            margin-bottom: 3px;
-            display: block;
-        }
-
-        .notice-value {
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: #333;
-            line-height: 1.4;
-        }
-
-        /* --- 오른쪽 메인 콘텐츠 --- */
+        /* --- 메인 콘텐츠 (과정 카드 그리드) --- */
         .main-content {
-            width: 72%;
-            padding: 50px;
-            background-color: var(--bg-light);
+            flex: 1;
+            padding: 50px 60px;
+            overflow-y: auto; /* 과정이 많을 경우 스크롤 허용 */
             display: grid;
+            /* 화면 크기에 맞춰 카드가 자동 배열되도록 설정 */
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 30px;
             align-content: start;
-            height: 100%;
-            overflow-y: auto;
         }
 
-        .count-1 { grid-template-columns: 1fr; }
-        .count-2 { grid-template-columns: 1fr 1fr; }
-        .count-3, .count-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
-        .count-3 .course-card:last-child { grid-column: span 2; }
-
+        /* --- 인터랙티브 플립(Flip) 카드 스타일 --- */
         .course-card {
-            background: white;
-            border-radius: 25px;
-            padding: 45px 50px;
-            box-shadow: var(--card-shadow);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            overflow: hidden;
-            height: 100%;
-            box-sizing: border-box;
+            background-color: transparent;
+            perspective: 1000px; /* 3D 효과 원근감 부여 */
+            height: 220px;
+            cursor: pointer;
             animation: fadeInUp 0.6s ease-out forwards;
-            border-top: 6px solid var(--lotte-red);
+            opacity: 0;
         }
 
-        .card-top .title {
-            font-size: 2.8rem; 
-            font-weight: 800;
-            color: var(--text-main);
-            line-height: 1.3;
-            word-break: keep-all;
-            margin-bottom: 20px;
-            min-height: 2.6em;
-            display: flex;
-            align-items: flex-start;
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+            box-shadow: var(--card-shadow);
+            border-radius: 25px;
         }
 
-        .card-top .info-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        /* 카드가 클릭(flipped 클래스 추가)되었을 때 뒤집어짐 */
+        .course-card.flipped .card-inner {
+            transform: rotateY(180deg);
         }
 
-        .card-top .info-row {
-            font-size: 1.25rem;
-            color: var(--text-sub);
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-        }
-
-        .card-top .info-label {
-            color: var(--text-main);
-            font-weight: 700;
-            min-width: 90px;
-            margin-right: 10px;
-        }
-
-        .card-bottom {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
-        }
-
-        .room-info {
-            background: #FFF2F3; 
-            border: 1px solid rgba(230, 0, 18, 0.08);
-            padding: 20px 30px;
-            border-radius: 15px;
-            flex: 1;
-            min-height: 130px;
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden; /* 뒷면 숨김 처리 */
+            border-radius: 25px;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
+            padding: 30px;
             box-sizing: border-box;
         }
 
-        .room-info span {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--lotte-red);
-            display: block;
-            margin-bottom: 8px;
+        /* 카드 앞면 (과정명) */
+        .card-front {
+            background-color: white;
+            border-top: 6px solid var(--lotte-red);
+            color: var(--text-main);
         }
 
-        .room-info p {
-            font-size: 2.1rem;
+        .card-front .title {
+            font-size: 1.8rem;
             font-weight: 800;
-            color: #222;
-            line-height: 1.25;
+            line-height: 1.4;
             word-break: keep-all;
-            margin: 0;
+        }
+        
+        .card-front .click-hint {
+            margin-top: 15px;
+            font-size: 0.95rem;
+            color: var(--lotte-red);
+            font-weight: 600;
+            background: #FFF2F3;
+            padding: 6px 15px;
+            border-radius: 20px;
         }
 
-        /* 1개짜리 과정을 위한 미세 조정 */
-        .count-1 .title { font-size: 5rem; min-height: 2.6em; }
-        .count-1 .info-row { font-size: 2rem; }
-        .count-1 .info-label { min-width: 140px; margin-right: 15px; }
-        .count-1 .room-info { min-height: 220px; }
-        .count-1 .room-info p { font-size: 4rem; }
+        /* 카드 뒷면 (층수 & 강의장) */
+        .card-back {
+            background-color: var(--lotte-red);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .card-back .floor {
+            font-size: 1.4rem;
+            font-weight: 700;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .card-back .room {
+            font-size: 2.6rem;
+            font-weight: 800;
+            word-break: keep-all;
+            line-height: 1.2;
+        }
 
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 로딩 텍스트 */
+        .loading-text {
+            grid-column: 1 / -1;
+            text-align: center;
+            font-size: 1.5rem;
+            color: var(--text-sub);
+            margin-top: 50px;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
 
 <div id="dashboard">
-    <aside class="sidebar">
+    <header>
         <div class="logo-area">
             <img src="logo.png" alt="LOTTE GRS" class="logo-img">
         </div>
-
         <div class="clock-area">
             <div id="current-date">0000. 00. 00 (요일)</div>
             <div id="current-time">00:00</div>
         </div>
-
-        <div class="guide-area">
-            <div class="guide-title" id="guideFloorTitle">5F 강의실 안내</div>
-            <p class="guide-text">
-                롯데지알에스 아카데미에 오신 것을 환영합니다.<br>
-                아래의 층을 터치하여 오늘 진행되는 교육 과정과<br>
-                강의실 위치를 확인해 주시기 바랍니다.
-            </p>
-        </div>
-
-        <div class="floor-nav">
-            <div class="floor-nav-title">FLOOR SELECTION</div>
-            <div class="floor-flex-list">
-                <button class="floor-btn active" data-floor="5F" data-gid="1841070893">5F</button>
-                <button class="floor-btn" data-floor="6F" data-gid="1863328310">6F</button>
-                <button class="floor-btn" data-floor="7F" data-gid="0">7F</button>
-                <button class="floor-btn" data-floor="8F" data-gid="1181338338">8F</button>
-            </div>
-        </div>
-
-         <div class="notice-area">
-            <div class="notice-item">
-                <span class="notice-label">Information</span>
-                <p class="notice-value">대표 번호 : 02-709-6920</p>
-            </div>
-        </div>
-    </aside>
+    </header>
 
     <main class="main-content" id="courseContainer">
+        <div class="loading-text">전체 교육 과정을 불러오는 중입니다...</div>
     </main>
 </div>
 
 <script>
     const BASE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThSEdRPQ80O2WMC8E-ceES--tvUAIVPlIR4_gmRq2Uoix8CxKqU3WQSkh5O3bKPI4tU56jqMXPKQcn/pub';
     
-    let currentGid = '1841070893'; // 최초 로딩 시 5F gid로 설정
-    let currentFloor = '5F';
+    // 💡 전체 층 데이터를 한 번에 수집하기 위한 배열 (이전 코드에서 제공해주신 gid 기준)
+    const sheets = [
+        { floor: '5F', gid: '1841070893' },
+        { floor: '6F', gid: '1863328310' },
+        { floor: '7F', gid: '0' },
+        { floor: '8F', gid: '1181338338' }
+    ];
 
     // 실시간 시계 시스템
     function updateClock() {
@@ -356,87 +233,70 @@
         document.getElementById('current-time').innerText = `${hh}:${mm}`;
     }
 
-    // 구글 시트 원본 CSV 데이터 파싱 및 가공 처리 함수
-    async function fetchSheetData() {
+    // 4개 층의 구글 시트 데이터를 동시에 불러와 합치는 함수
+    async function fetchAllCourses() {
         try {
-            const targetUrl = `${BASE_SHEET_URL}?gid=${currentGid}&single=true&output=csv`;
-            const response = await fetch(targetUrl);
-            const data = await response.text();
-            const rows = data.split('\n').slice(1);
-            
-            const courses = rows.map(row => {
-                const cols = row.split(',');
-                return {
-                    title: cols[0]?.trim(),
-                    period: cols[1]?.trim(),
-                    room: cols[2]?.trim(),
-                    time: cols[4]?.trim()
-                };
-            }).filter(item => item.title).slice(0, 4);
+            // Promise.all을 사용하여 4개의 시트를 동시에 병렬로 로드 (속도 향상)
+            const fetchPromises = sheets.map(async (sheet) => {
+                const targetUrl = `${BASE_SHEET_URL}?gid=${sheet.gid}&single=true&output=csv`;
+                const response = await fetch(targetUrl);
+                const data = await response.text();
+                const rows = data.split('\n').slice(1);
+                
+                // 각 층별 CSV 파싱 (비어있는 행 제외)
+                return rows.map(row => {
+                    const cols = row.split(',');
+                    return {
+                        title: cols[0]?.trim(),
+                        room: cols[2]?.trim(),
+                        floor: sheet.floor // 데이터에 소속 층수 라벨링
+                    };
+                }).filter(item => item.title && item.title !== ""); // 과정명이 있는 데이터만 필터링
+            });
 
-            renderDashboard(courses);
+            // 4개 층의 결과를 하나로 통합
+            const results = await Promise.all(fetchPromises);
+            const allCourses = results.flat(); 
+
+            renderDashboard(allCourses);
         } catch (error) {
             console.error('데이터 로드 오류:', error);
+            document.getElementById('courseContainer').innerHTML = `<div class="loading-text" style="color:var(--lotte-red);">데이터를 불러오는 데 실패했습니다. 연결을 확인해주세요.</div>`;
         }
     }
 
-    // 카드 렌더링 시스템 (화살표 제거됨)
+    // 카드를 화면에 렌더링하는 함수
     function renderDashboard(courses) {
         const container = document.getElementById('courseContainer');
-        container.className = `main-content count-${courses.length}`;
         
         if (courses.length === 0) {
-            container.innerHTML = `<div style="grid-column: span 2; text-align:center; font-size:2rem; color:#999; align-self:center;">현재 진행 중인 교육 과정이 없습니다.</div>`;
+            container.innerHTML = `<div class="loading-text">현재 등록된 교육 과정이 없습니다.</div>`;
             return;
         }
 
+        // HTML 문자열로 카드 리스트 생성
         container.innerHTML = courses.map((course, index) => `
-            <div class="course-card" style="animation-delay: ${index * 0.1}s">
-                <div class="card-top">
-                    <h2 class="title">${course.title}</h2>
-                    <div class="info-group">
-                        <div class="info-row">
-                            <span class="info-label">교육 일정 :</span>
-                            <span>${course.period || '-'}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">교육 시간 :</span>
-                            <span>${course.time || '-'}</span>
-                        </div>
+            <div class="course-card" style="animation-delay: ${index * 0.05}s" onclick="this.classList.toggle('flipped')">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <h2 class="title">${course.title}</h2>
+                        <span class="click-hint">터치하여 강의장 확인 👆</span>
                     </div>
-                </div>
-                <div class="card-bottom">
-                    <div class="room-info">
-                        <span>LECTURE ROOM</span>
-                        <p>${course.room || '-'}</p>
+                    <div class="card-back">
+                        <div class="floor">${course.floor} FLOOR</div>
+                        <div class="room">${course.room || '-'}</div>
                     </div>
                 </div>
             </div>
         `).join('');
     }
 
-    // 층 컨트롤러 클릭 스위칭 바인딩
-    const floorButtons = document.querySelectorAll('.floor-btn');
-    floorButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            floorButtons.forEach(b => b.classList.remove('active'));
-            e.currentTarget.classList.add('active');
-            
-            currentGid = e.currentTarget.getAttribute('data-gid');
-            currentFloor = e.currentTarget.getAttribute('data-floor');
-            
-            document.getElementById('guideFloorTitle').innerText = `${currentFloor} 강의실 안내`;
-            
-            fetchSheetData();
-        });
-    });
-
-    // 백그라운드 구동 타이머 루프 세팅
+    // 시스템 실행 및 타이머
     updateClock();
-    setInterval(updateClock, 1000);
+    setInterval(updateClock, 1000); // 1초 단위 시계 갱신
     
-    fetchSheetData();
-    setInterval(fetchSheetData, 60000); // 1분 단위 새로고침
+    fetchAllCourses();
+    setInterval(fetchAllCourses, 60000); // 1분 단위 구글시트 자동 새로고침
 </script>
 
 </body>
