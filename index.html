@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>롯데지알에스 아카데미 안내</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <style>
+        :root {
+            --lotte-red: #E60012;
+            --bg-light: #F8F9FA;
+            --text-main: #1A1A1A;
+            --text-sub: #666666;
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
+
+        body {
+            background-color: #222;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* 전체 컨테이너: 16:9 비율 완벽 유지 */
+        #dashboard {
+            width: 100vw;
+            height: 56.25vw;
+            max-height: 100vh;
+            max-width: 177.78vh;
+            background-color: white;
+            display: flex;
+            box-shadow: 0 0 100px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        /* --- 왼쪽 사이드바 --- */
+        .sidebar {
+            width: 28%;
+            background-color: white;
+            border-right: 1px solid #EEE;
+            display: flex;
+            flex-direction: column;
+            padding: 40px 35px;
+        }
+
+        .logo-area {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .logo-img {
+            height: 30px;
+            width: auto;
+        }
+
+        /* 시계 영역 */
+        .clock-area {
+            margin-bottom: 30px;
+        }
+
+        #current-date {
+            font-size: 1.3rem;
+            color: var(--text-sub);
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        #current-time {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -2px;
+            line-height: 1;
+        }
+
+        /* 안내 문구 영역 (층 선택 위로 이동) */
+        .guide-area {
+            margin-bottom: 25px;
+        }
+
+        .guide-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--lotte-red);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .guide-title::after {
+            content: "";
+            flex: 1;
+            height: 2px;
+            background: #EEE;
+        }
+
+        .guide-text {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #444;
+            word-break: keep-all;
+        }
+
+        /* 층별 네비게이션 탭 (일렬 배치 구조로 전면 수정) */
+        .floor-nav {
+            flex: 1; /* 대시보드 내부 영역을 채우도록 설정 */
+            margin-bottom: 25px;
+        }
+        
+        .floor-nav-title {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .floor-flex-list {
+            display: flex;
+            flex-direction: column; /* 세로 일렬 정렬 */
+            gap: 10px;
+        }
+
+        .floor-btn {
+            width: 100%;
+            background-color: #F1F3F5;
+            border: 1px solid #E9ECEF;
+            color: var(--text-main);
+            padding: 14px 15px; /* 시각적으로 안정적인 패딩값 조정 */
+            font-size: 1.25rem;
+            font-weight: 800;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            text-align: center;
+        }
+
+        .floor-btn:hover {
+            background-color: #E9ECEF;
+        }
+
+        .floor-btn.active {
+            background-color: var(--lotte-red);
+            border-color: var(--lotte-red);
+            color: white;
+            box-shadow: 0 4px 12px rgba(230, 0, 18, 0.2);
+        }
+
+        /* 공지사항 (하단 고정 - 와이파이 제거됨) */
+        .notice-area {
+            background-color: #F9F9F9;
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid var(--lotte-red);
+        }
+
+        .notice-item { margin-bottom: 0; } /* 단일 아이템이므로 마진 제거 */
+
+        .notice-label {
+            font-size: 0.85rem;
+            color: var(--lotte-red);
+            font-weight: 700;
+            margin-bottom: 3px;
+            display: block;
+        }
+
+        .notice-value {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        /* --- 오른쪽 메인 콘텐츠 --- */
+        .main-content {
+            width: 72%;
+            padding: 50px;
+            background-color: var(--bg-light);
+            display: grid;
+            gap: 30px;
+            align-content: start;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .count-1 { grid-template-columns: 1fr; }
+        .count-2 { grid-template-columns: 1fr 1fr; }
+        .count-3, .count-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+        .count-3 .course-card:last-child { grid-column: span 2; }
+
+        .course-card {
+            background: white;
+            border-radius: 25px;
+            padding: 45px 50px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            box-sizing: border-box;
+            animation: fadeInUp 0.6s ease-out forwards;
+            border-top: 6px solid var(--lotte-red);
+        }
+
+        .card-top .title {
+            font-size: 2.8rem; 
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.3;
+            word-break: keep-all;
+            margin-bottom: 20px;
+            min-height: 2.6em;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .card-top .info-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .card-top .info-row {
+            font-size: 1.25rem;
+            color: var(--text-sub);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-top .info-label {
+            color: var(--text-main);
+            font-weight: 700;
+            min-width: 90px;
+            margin-right: 10px;
+        }
+
+        .card-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        .room-info {
+            background: #FFF2F3; 
+            border: 1px solid rgba(230, 0, 18, 0.08);
+            padding: 20px 30px;
+            border-radius: 15px;
+            flex: 1;
+            min-height: 130px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        .room-info span {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--lotte-red);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .room-info p {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: #222;
+            line-height: 1.25;
+            word-break: keep-all;
+            margin: 0;
+        }
+
+        .direction-arrow {
+            flex-shrink: 0;
+            width: 80px; 
+            font-size: 6rem;
+            color: var(--lotte-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 1개짜리 과정을 위한 미세 조정 */
+        .count-1 .title { font-size: 5rem; min-height: 2.6em; }
+        .count-1 .info-row { font-size: 2rem; }
+        .count-1 .info-label { min-width: 140px; margin-right: 15px; }
+        .count-1 .direction-arrow { font-size: 12rem; width: 150px; }
+        .count-1 .room-info { min-height: 220px; }
+        .count-1 .room-info p { font-size: 4rem; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div id="dashboard">
+    <aside class="sidebar">
+        <div class="logo-area">
+            <img src="logo.png" alt="LOTTE GRS" class="logo-img">
+        </div>
+
+        <div class="clock-area">
+            <div id="current-date">0000. 00. 00 (요일)</div>
+            <div id="current-time">00:00</div>
+        </div>
+
+        <div class="guide-area">
+            <div class="guide-title" id="guideFloorTitle">5F 강의실 안내</div>
+            <p class="guide-text">
+                롯데지알에스 아카데미에 오신 것을 환영합니다.<br>
+                아래의 층을 터치하여 오늘 진행되는 교육 과정과<br>
+				강의실 위치를 확인해 주시기 바랍니다.
+            </p>
+        </div>
+
+        <div class="floor-nav">
+            <div class="floor-nav-title">FLOOR SELECTION</div>
+            <div class="floor-flex-list">
+                <button class="floor-btn active" data-floor="5F" data-gid="1841070893">5F</button>
+                <button class="floor-btn" data-floor="6F" data-gid="1863328310">6F</button>
+                <button class="floor-btn" data-floor="7F" data-gid="0">7F</button>
+                <button class="floor-btn" data-floor="8F" data-gid="1181338338">8F</button>
+            </div>
+        </div>
+
+         <div class="notice-area">
+            <div class="notice-item">
+                <span class="notice-label">Information</span>
+                <p class="notice-value">대표 번호 : 02-709-6920</p>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content" id="courseContainer">
+        </main>
+</div>
+
+<script>
+    const BASE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThSEdRPQ80O2WMC8E-ceES--tvUAIVPlIR4_gmRq2Uoix8CxKqU3WQSkh5O3bKPI4tU56jqMXPKQcn/pub';
+    
+    let currentGid = '0';
+    let currentFloor = '5F';
+
+    // 화살표 SVG 데이터 맵
+    const createArrow = (path) => `<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor"><path d="${path}"/></svg>`;
+    const arrowMap = {
+        'left': createArrow('M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z'),
+        'right': createArrow('M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z'),
+        'up': createArrow('M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z'),
+        'straight': createArrow('M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z'),
+        'down': createArrow('M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z')
+    };
+
+    // 실시간 시계 시스템
+    function updateClock() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        const week = ['일', '월', '화', '수', '목', '금', '토'][now.getDay()];
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+
+        document.getElementById('current-date').innerText = `${y}. ${m}. ${d} (${week})`;
+        document.getElementById('current-time').innerText = `${hh}:${mm}`;
+    }
+
+    // 구글 시트 원본 CSV 데이터 파싱 및 가공 처리 함수
+    async function fetchSheetData() {
+        try {
+            const targetUrl = `${BASE_SHEET_URL}?gid=${currentGid}&single=true&output=csv`;
+            const response = await fetch(targetUrl);
+            const data = await response.text();
+            const rows = data.split('\n').slice(1);
+            
+            const courses = rows.map(row => {
+                const cols = row.split(',');
+                return {
+                    title: cols[0]?.trim(),
+                    period: cols[1]?.trim(),
+                    room: cols[2]?.trim(),
+                    direction: cols[3]?.trim().toLowerCase(),
+                    time: cols[4]?.trim()
+                };
+            }).filter(item => item.title).slice(0, 4);
+
+            renderDashboard(courses);
+        } catch (error) {
+            console.error('데이터 로드 오류:', error);
+        }
+    }
+
+    // 카드 렌더링 시스템
+    function renderDashboard(courses) {
+        const container = document.getElementById('courseContainer');
+        container.className = `main-content count-${courses.length}`;
+        
+        if (courses.length === 0) {
+            container.innerHTML = `<div style="grid-column: span 2; text-align:center; font-size:2rem; color:#999; align-self:center;">현재 진행 중인 교육 과정이 없습니다.</div>`;
+            return;
+        }
+
+        container.innerHTML = courses.map((course, index) => `
+            <div class="course-card" style="animation-delay: ${index * 0.1}s">
+                <div class="card-top">
+                    <h2 class="title">${course.title}</h2>
+                    <div class="info-group">
+                        <div class="info-row">
+                            <span class="info-label">교육 일정 :</span>
+                            <span>${course.period || '-'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">교육 시간 :</span>
+                            <span>${course.time || '-'}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-bottom">
+                    <div class="room-info">
+                        <span>LECTURE ROOM</span>
+                        <p>${course.room}</p>
+                    </div>
+                    <div class="direction-arrow">${arrowMap[course.direction] || arrowMap['right']}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // 층 컨트롤러 클릭 스위칭 바인딩
+    const floorButtons = document.querySelectorAll('.floor-btn');
+    floorButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            floorButtons.forEach(b => b.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            
+            currentGid = e.currentTarget.getAttribute('data-gid');
+            currentFloor = e.currentTarget.getAttribute('data-floor');
+            
+            document.getElementById('guideFloorTitle').innerText = `${currentFloor} 강의실 안내`;
+            
+            fetchSheetData();
+        });
+    });
+
+    // 백그라운드 구동 타이머 루프 세팅
+    updateClock();
+    setInterval(updateClock, 1000);
+    
+    fetchSheetData();
+    setInterval(fetchSheetData, 60000); // 1분 단위 새로고침
+</script>
+
+</body>
+</html>
