@@ -250,13 +250,13 @@
 
         /* --- 하단 모던 인포메이션 푸터 --- */
         footer {
-            background-color: #1A1A1A;
+            background-color: #FFFFFF;
             height: 65px;
             display: flex;
             justify-content: center; /* 가운데 정렬로 세련됨 강조 */
             align-items: center;
             flex-shrink: 0;
-            border-top: 2px solid var(--lotte-red);
+
         }
 
         .contact-capsule {
@@ -270,10 +270,10 @@
         }
 
         .contact-label {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #AAAAAA;
-            letter-spacing: 1.5px;
+			font-size: 0.9rem;
+			font-weight: 600;
+			color: var(--lotte-red); /* 롯데 레드로 변경 */
+			letter-spacing: 1.5px;
         }
 
         .contact-divider {
@@ -283,14 +283,14 @@
         }
 
         .contact-number {
-            font-size: 1.25rem;
-            font-weight: 800;
-            color: #FFFFFF;
-            letter-spacing: 0.5px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #121212;
+            letter-spacing: 1.5px;
         }
         
         .contact-number span {
-            color: var(--lotte-red);
+            color: #121212;
         }
     </style>
 </head>
@@ -334,7 +334,7 @@
         <div class="contact-capsule">
             <span class="contact-label">INFORMATION</span>
             <span class="contact-divider"></span>
-            <span class="contact-number"><span>📞</span> 02-709-6920</span>
+            <span class="contact-number"><span> 02-709-6920</span>
         </div>
     </footer>
 </div>
@@ -405,7 +405,7 @@
         const container = document.getElementById('courseContainer');
         
         if (courses.length === 0) {
-            container.innerHTML = `<div class="loading-text">해당 조건에 등록된 교육 과정이 없습니다.</div>`;
+            container.innerHTML = `<div class="loading-text">현재 진행중인 교육과정이 없습니다.</div>`;
             return;
         }
 
