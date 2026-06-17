@@ -248,15 +248,108 @@
             font-weight: 600;
         }
 
+        /* --- 과정이 없을 때(Empty State) & 층별 안내 스타일 --- */
+        .empty-state-wrapper {
+            grid-column: 1 / -1; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .empty-message {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--lotte-red);
+            background: #FFF2F3;
+            padding: 15px 40px;
+            border-radius: 30px;
+            border: 1px solid rgba(230,0,18,0.1);
+            margin-bottom: 35px;
+            box-shadow: 0 4px 15px rgba(230,0,18,0.05);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .floor-guide-container {
+            width: 100%;
+            max-width: 1100px;
+            background: white;
+            border-radius: 25px;
+            box-shadow: var(--card-shadow);
+            padding: 40px 50px;
+        }
+
+        .floor-guide-title {
+            font-size: 1.5rem;
+            color: var(--text-main);
+            font-weight: 800;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .floor-guide-title::after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 4px;
+            background: var(--lotte-red);
+            margin: 12px auto 0;
+            border-radius: 2px;
+        }
+
+        .floor-guide-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 2단 배열로 세련되게 */
+            gap: 20px 30px;
+        }
+
+        .floor-item {
+            display: flex;
+            align-items: center;
+            padding: 18px 25px;
+            background: var(--bg-light);
+            border-radius: 18px;
+            transition: transform 0.2s;
+            border: 1px solid #EBEBEB;
+        }
+
+        .floor-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.04);
+            border-color: #DDD;
+        }
+
+        .floor-num {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--lotte-red);
+            width: 65px;
+            flex-shrink: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .floor-desc {
+            font-size: 1.1rem;
+            color: var(--text-sub);
+            font-weight: 500;
+            line-height: 1.5;
+            word-break: keep-all;
+        }
+
         /* --- 하단 모던 인포메이션 푸터 --- */
         footer {
             background-color: #FFFFFF;
             height: 65px;
             display: flex;
-            justify-content: center; /* 가운데 정렬로 세련됨 강조 */
+            justify-content: center; 
             align-items: center;
             flex-shrink: 0;
-
         }
 
         .contact-capsule {
@@ -272,7 +365,7 @@
         .contact-label {
 			font-size: 0.9rem;
 			font-weight: 600;
-			color: var(--lotte-red); /* 롯데 레드로 변경 */
+			color: var(--lotte-red); 
 			letter-spacing: 1.5px;
         }
 
@@ -404,8 +497,45 @@
     function renderDashboard(courses) {
         const container = document.getElementById('courseContainer');
         
+        // 데이터가 없을 때 층별 안내 UI 출력
         if (courses.length === 0) {
-            container.innerHTML = `<div class="loading-text">현재 진행중인 교육과정이 없습니다.</div>`;
+            container.innerHTML = `
+                <div class="empty-state-wrapper">
+                    <div class="empty-message">
+                        현재 진행 중인 교육 과정이 없습니다.
+                    </div>
+                    
+                    <div class="floor-guide-container">
+                        <h3 class="floor-guide-title">아카데미 층별 안내</h3>
+                        <ul class="floor-guide-list">
+                            <li class="floor-item">
+                                <span class="floor-num">10F</span>
+                                <span class="floor-desc">기숙사, 독서실, 세탁실, 휴게실</span>
+                            </li>
+                            <li class="floor-item">
+                                <span class="floor-num">9F</span>
+                                <span class="floor-desc">인재육성팀 사무실, 히스토리뮤지엄, 영상 촬영실</span>
+                            </li>
+                            <li class="floor-item">
+                                <span class="floor-num">8F</span>
+                                <span class="floor-desc">롯데리아 롤플레잉 실습장, 후라이 스테이션, 그릴 스테이션, 휴게실</span>
+                            </li>
+                            <li class="floor-item">
+                                <span class="floor-num">7F</span>
+                                <span class="floor-desc">스탠브루 파일럿샵, 플레이팅 조리실습장, 에스프레소룸, 로스팅룸, 베이커리룸</span>
+                            </li>
+                            <li class="floor-item">
+                                <span class="floor-num">6F</span>
+                                <span class="floor-desc">크리스피크림도넛 실습장, 중강의장, 소강의장, 휴게공간</span>
+                            </li>
+                            <li class="floor-item">
+                                <span class="floor-num">5F</span>
+                                <span class="floor-desc">대강의장, 중강의장, 전산실습장, 휴게실, 탈의실</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            `;
             return;
         }
 
