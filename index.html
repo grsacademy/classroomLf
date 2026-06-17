@@ -248,26 +248,26 @@
             font-weight: 600;
         }
 
-        /* --- 과정이 없을 때(Empty State) & 층별 안내 스타일 --- */
+        /* --- 과정이 없을 때(Empty State) & 층별 안내 스타일 (크기 확대 업데이트) --- */
         .empty-state-wrapper {
             grid-column: 1 / -1; 
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px 0;
+            padding: 10px 0;
             animation: fadeInUp 0.6s ease-out forwards;
         }
 
         .empty-message {
-            font-size: 1.4rem;
+            font-size: 1.6rem; /* 글씨 크기 확대 */
             font-weight: 700;
             color: var(--lotte-red);
             background: #FFF2F3;
-            padding: 15px 40px;
-            border-radius: 30px;
+            padding: 18px 50px; /* 패딩 확대 */
+            border-radius: 35px;
             border: 1px solid rgba(230,0,18,0.1);
-            margin-bottom: 35px;
+            margin-bottom: 40px; /* 안내창과의 여백 확보 */
             box-shadow: 0 4px 15px rgba(230,0,18,0.05);
             display: inline-flex;
             align-items: center;
@@ -276,18 +276,18 @@
 
         .floor-guide-container {
             width: 100%;
-            max-width: 1100px;
+            max-width: 1400px; /* 1100px -> 1400px로 대폭 확대 */
             background: white;
-            border-radius: 25px;
+            border-radius: 30px;
             box-shadow: var(--card-shadow);
-            padding: 40px 50px;
+            padding: 50px 60px; /* 내부 여백 확대 */
         }
 
         .floor-guide-title {
-            font-size: 1.5rem;
+            font-size: 1.8rem; /* 1.5rem -> 1.8rem */
             color: var(--text-main);
             font-weight: 800;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             text-align: center;
             position: relative;
         }
@@ -295,50 +295,50 @@
         .floor-guide-title::after {
             content: '';
             display: block;
-            width: 40px;
-            height: 4px;
+            width: 50px;
+            height: 5px;
             background: var(--lotte-red);
-            margin: 12px auto 0;
-            border-radius: 2px;
+            margin: 14px auto 0;
+            border-radius: 3px;
         }
 
         .floor-guide-list {
             list-style: none;
             display: grid;
-            grid-template-columns: 1fr 1fr; /* 2단 배열로 세련되게 */
-            gap: 20px 30px;
+            grid-template-columns: 1fr 1fr; 
+            gap: 25px 40px; /* 아이템 간격 여유롭게 조정 */
         }
 
         .floor-item {
             display: flex;
             align-items: center;
-            padding: 18px 25px;
+            padding: 24px 35px; /* 내부 박스 크기 키움 */
             background: var(--bg-light);
-            border-radius: 18px;
+            border-radius: 22px;
             transition: transform 0.2s;
             border: 1px solid #EBEBEB;
         }
 
         .floor-item:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.04);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
             border-color: #DDD;
         }
 
         .floor-num {
-            font-size: 1.6rem;
+            font-size: 2.2rem; /* 1.6rem -> 2.2rem 시원하게 확대 */
             font-weight: 800;
             color: var(--lotte-red);
-            width: 65px;
+            width: 90px; /* 숫자 영역 너비 확장 */
             flex-shrink: 0;
             letter-spacing: -0.5px;
         }
 
         .floor-desc {
-            font-size: 1.1rem;
+            font-size: 1.35rem; /* 1.1rem -> 1.35rem 글씨 확대 */
             color: var(--text-sub);
-            font-weight: 500;
-            line-height: 1.5;
+            font-weight: 600; /* 선명도 향상을 위해 굵기 조정 */
+            line-height: 1.6;
             word-break: keep-all;
         }
 
@@ -390,7 +390,6 @@
 <body>
 
 <div id="dashboard">
-    <!-- 상단 헤더 -->
     <header>
         <div class="logo-area">
             <img src="logo.png" alt="LOTTE GRS" class="logo-img">
@@ -401,13 +400,11 @@
         </div>
     </header>
 
-    <!-- 서브 헤더 -->
     <div class="sub-header">
         <div class="guide-box">
             <h2>오늘의 교육 과정 <span id="total-count" style="font-size:1.1rem; color:#999; margin-left:12px; font-weight:600;">(불러오는 중...)</span></h2>
             <p>아래의 <span class="highlight">과정 박스를 터치</span>하시면 교육이 진행되는 층수와 강의장을 확인하실 수 있습니다.</p>
         </div>
-        <!-- 필터 버튼 영역 -->
         <div class="filter-group">
             <button class="filter-btn active" data-filter="all">전체보기</button>
             <button class="filter-btn" data-filter="5F">5F</button>
@@ -417,12 +414,10 @@
         </div>
     </div>
 
-    <!-- 메인 그리드 -->
     <main class="main-content" id="courseContainer">
         <div class="loading-text">전체 교육 과정을 동기화 중입니다...</div>
     </main>
 
-    <!-- 세련된 모던 푸터 -->
     <footer>
         <div class="contact-capsule">
             <span class="contact-label">INFORMATION</span>
