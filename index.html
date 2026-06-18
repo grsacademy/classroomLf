@@ -629,10 +629,10 @@
                         <h2 class="title">${course.title}</h2>
                         <span class="click-hint">터치하여 강의장 확인 👆</span>
                     </div>
-                    <div class="card-back">
-                        <div class="floor">${course.floor} FLOOR</div>
-                        <div class="room">${course.room || '-'}</div>
-                    </div>
+                   <div class="card-back">
+					<div class="floor">${course.floor.replace('F', '')} FLOOR</div>
+					<div class="room">${course.room || '-'}</div>
+					</div>
                 </div>
             </div>
         `).join('');
