@@ -484,6 +484,7 @@
             <button class="filter-btn" data-filter="6F">6F</button>
             <button class="filter-btn" data-filter="7F">7F</button>
             <button class="filter-btn" data-filter="8F">8F</button>
+            <button class="filter-btn" data-filter="9F">9F</button>
         </div>
     </div>
 
@@ -511,15 +512,9 @@
 </div>
 
 <script>
-    const BASE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThSEdRPQ80O2WMC8E-ceES--tvUAIVPlIR4_gmRq2Uoix8CxKqU3WQSkh5O3bKPI4tU56jqMXPKQcn/pub';
+    // 이전에 관리자 앱을 만드셨던 통합 구글 시트의 ID (변동 시 이 부분만 교체)
+    const SHEET_ID = '1Fhdq_2UZQ9J4vU_PJp5pXbrYmdTvJmeWF7gk5bpAlGw';
     
-    const sheets = [
-        { floor: '5F', gid: '1841070893' },
-        { floor: '6F', gid: '1863328310' },
-        { floor: '7F', gid: '0' },
-        { floor: '8F', gid: '1181338338' }
-    ];
-
     let globalCourses = [];
 
     // 시계 동기화 함수
@@ -536,30 +531,83 @@
         document.getElementById('current-time').innerText = `${hh}:${mm}`;
     }
 
-    // 구글 시트 데이터 로드 함수
+    // 날짜 데이터를 YYYY-MM-DD 형식의 문자열로 안전하게 변환하는 헬퍼 함수
+    function parseGvizDate(cell) {
+        if (!cell) return '';
+        // 1. 이미 포맷된 문자열(f)이 있는 경우 (예: "2026-06-27" 또는 "2026. 06. 27")
+        if (cell.f) {
+            return String(cell.f).replace(/\./g, '-').replace(/\s/g, '').substring(0, 10);
+        }
+        // 2. 값(v)이 있는 경우
+        if (cell.v) {
+            const val = String(cell.v);
+            // 구글 Visualization API 특유의 날짜 형식 'Date(2026,5,27)' 인 경우 파싱 (월이 0부터 시작함)
+            if (val.startsWith('Date(')) {
+                const match = val.match(/Date\((\d+),(\d+),(\d+)/);
+                if (match) {
+                    const y = match[1];
+                    const m = String(parseInt(match[2]) + 1).padStart(2, '0');
+                    const d = String(match[3]).padStart(2, '0');
+                    return `${y}-${m}-${d}`;
+                }
+            }
+            // 그 외 일반 문자열
+            return val.substring(0, 10);
+        }
+        return '';
+    }
+
+    // 구글 시트 통합 데이터 로드 함수 (단일 호출로 변경)
     async function fetchAllCourses() {
         try {
-            const fetchPromises = sheets.map(async (sheet) => {
-                const targetUrl = `${BASE_SHEET_URL}?gid=${sheet.gid}&single=true&output=csv`;
-                const response = await fetch(targetUrl);
-                const data = await response.text();
-                const rows = data.split('\n').slice(1);
-                
-                return rows.map(row => {
-                    const cols = row.split(',');
-                    return {
-                        title: cols[0]?.trim(),
-                        room: cols[2]?.trim(),
-                        floor: sheet.floor
-                    };
-                }).filter(item => item.title && item.title !== ""); 
-            });
+            // Google Visualization API를 활용해 시트를 JSON으로 가져옴
+            const targetUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=교육일정`;
+            const response = await fetch(targetUrl);
+            const text = await response.text();
+            
+            // 콜백 함수로 감싸진 JSON 데이터를 정규식으로 추출
+            const jsonStr = text.match(/google\.visualization\.Query\.setResponse\(([\s\S\w]+)\);/)[1];
+            const data = JSON.parse(jsonStr);
+            const rows = data.table.rows;
 
-            const results = await Promise.all(fetchPromises);
-            globalCourses = results.flat(); 
+            // 로비에 표시할 기준일(오늘 날짜)을 YYYY-MM-DD 포맷으로 생성
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            const todayStr = `${y}-${m}-${d}`;
+
+            globalCourses = [];
+
+            if (rows) {
+                rows.forEach(row => {
+                    if (!row || !row.c) return;
+                    
+                    // 각 열의 데이터 가져오기 (인덱스는 시트의 열 A=0, B=1... 기준)
+                    // B(1): 과정명, C(2): 시작일, D(3): 종료일, G(6): 층, H(7): 강의장, K(10): 상태
+                    const title = row.c[1] ? (row.c[1].v || row.c[1].f) : '';
+                    const startDate = parseGvizDate(row.c[2]); 
+                    const endDate = parseGvizDate(row.c[3]);
+                    const floorRaw = row.c[6] ? (row.c[6].v || row.c[6].f) : '';
+                    const room = row.c[7] ? (row.c[7].v || row.c[7].f) : '';
+                    const status = row.c[10] ? (row.c[10].v || row.c[10].f) : '';
+
+                    // 관리자 앱에서 입력한 '5층' 등을 로비의 필터 기준인 '5F' 형식으로 변환
+                    const floorFormat = String(floorRaw).replace('층', 'F');
+
+                    // ★ 핵심 로직: 상태가 '예약'이며, 오늘(todayStr)이 시작일과 종료일 사이에 있을 때만 화면에 노출
+                    if (status === '예약' && startDate <= todayStr && todayStr <= endDate) {
+                        globalCourses.push({
+                            title: String(title),
+                            room: String(room),
+                            floor: floorFormat
+                        });
+                    }
+                });
+            }
 
             // 총 건수 업데이트
-            document.getElementById('total-count').innerText = `(총 ${globalCourses.length}건)`;
+            document.getElementById('total-count').innerText = `(오늘 총 ${globalCourses.length}건)`;
 
             // 현재 눌려진 필터 상태에 맞춰 화면 렌더링
             const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
@@ -567,7 +615,7 @@
 
         } catch (error) {
             console.error('데이터 로드 오류:', error);
-            document.getElementById('courseContainer').innerHTML = `<div class="loading-text" style="color:var(--lotte-red);">데이터를 불러오는 데 실패했습니다. 연결을 확인해주세요.</div>`;
+            document.getElementById('courseContainer').innerHTML = `<div class="loading-text" style="color:var(--lotte-red);">데이터를 불러오는 데 실패했습니다. 관리자에게 문의해주세요.</div>`;
         }
     }
 
@@ -577,7 +625,6 @@
         
         // 데이터가 없을 때 층별 안내 UI 출력
         if (courses.length === 0) {
-            // 변경사항 반영: 9,10 / 7,8 / 5,6 순서 배열
             container.innerHTML = `
                 <div class="empty-state-wrapper">
                     <div class="empty-message">
@@ -643,14 +690,13 @@
         document.getElementById('modalTitle').innerText = floorNumber + 'F 교육 시설';
         
         const imgEl = document.getElementById('modalImg');
-        const imgPath = `floor_${floorNumber}.png`; // 파일명 예시: floor_5.png
+        const imgPath = `floor_${floorNumber}.png`; 
         
-        // 이미지가 준비되지 않았을 때 표시될 기본 안내 화면 (SVG)
         const fallbackSvg = `data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22400%22 viewBox=%220 0 800 400%22%3E%3Crect fill=%22%23f9f9f9%22 width=%22800%22 height=%22400%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2226%22 font-weight=%22bold%22 x=%2250%25%22 y=%2245%25%22 text-anchor=%22middle%22%3E%EC%95%84%EC%A7%81 %EC%9D%B4%EB%AF%B8%EC%A7%80%EA%B0%80 %EC%97%86%EC%8A%B5%EB%8B%88%EB%8B%A4%3C/text%3E%3Ctext fill=%22%23aaa%22 font-family=%22sans-serif%22 font-size=%2218%22 x=%2250%25%22 y=%2258%25%22 text-anchor=%22middle%22%3E(${imgPath} %ED%8C%8C%EC%9D%BC%EC%9D%84 HTML%EA%B3%BC %EA%B0%99%EC%9D%80 %ED%8F%B4%EB%8D%94%EC%97%90 %EB%84%A3%EC%96%B4%EC%A3%BC%EC%84%B8%EC%9A%94)%3C/text%3E%3C/svg%3E`;
 
         imgEl.onerror = function() {
             this.src = fallbackSvg;
-            this.onerror = null; // 무한루프 방지
+            this.onerror = null; 
         };
         imgEl.src = imgPath;
 
@@ -672,7 +718,7 @@
         }
     }
 
-    // 20초마다 실행되는 자동 리셋 및 데이터 최신화 함수
+    // 주기적으로 실행되는 자동 리셋 및 데이터 최신화 함수
     function resetAndFetch() {
         const filterBtns = document.querySelectorAll('.filter-btn');
         filterBtns.forEach(b => b.classList.remove('active'));
@@ -692,11 +738,12 @@
         });
     });
 
+    // 시작 시 즉시 실행 및 인터벌 설정
     updateClock();
     setInterval(updateClock, 1000); 
     
     fetchAllCourses();
-    setInterval(resetAndFetch, 20000); 
+    setInterval(resetAndFetch, 60000); // 1분(60초) 단위로 데이터 최신화
 </script>
 
 </body>
